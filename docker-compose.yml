@@ -1,0 +1,63 @@
+version: '3.5'
+services:
+  # package.json用
+  layer:
+    image: node:12-slim
+    tty: true
+    volumes:
+      - ./opt/:/srv:rw,delegated
+    ports:
+      - 3000:3000
+    working_dir: /srv
+    environment:
+      TZ: 'Asia/Tokyo'
+
+  lambda:
+    image: lambci/lambda:nodejs12.x
+    tty: true
+    volumes:
+      - ./lambda:/var/task:rw,delegated
+      - ./opt:/opt:ro,delegated
+    ports:
+      - 9001:9001
+    environment:
+      DOCKER_LAMBDA_STAY_OPEN: 1
+      DOCKER_LAMBDA_WATCH: 1
+      DOCKER_LAMBDA_DEBUG: 1
+      TZ: 'Asia/Tokyo'
+    env_file:
+      - .env
+    command: index.handler
+    depends_on:
+      - "dynamodb-local"
+    networks:
+      - dynamodb-local-network
+
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: dynamodb_local
+    user: root
+    command: -jar DynamoDBLocal.jar -sharedDb -dbPath /data
+    volumes:
+      - ./dynamodb_data:/data
+    ports:
+      - 8000:8000
+    networks:
+      - dynamodb-local-network
+
+  # GUI
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: dynamodb-admin
+    environment:
+      - DYNAMO_ENDPOINT=dynamodb-local:8000
+    ports:
+      - 8001:8001
+    depends_on:
+      - dynamodb-local
+    networks:
+      - dynamodb-local-network
+
+networks:
+  dynamodb-local-network:
+    driver: bridge

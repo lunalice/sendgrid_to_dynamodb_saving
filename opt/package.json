@@ -1,0 +1,16 @@
+{
+  "name": "lambda-dynamo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/comolib/kodomo-booster.git",
+  "author": "lunalice <yamashita0120@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.188.0",
+    "@aws-sdk/lib-dynamodb": "^3.188.0",
+    "@aws-sdk/util-dynamodb": "^3.188.0",
+    "aws-sdk": "^2.1232.0",
+    "dynamodb-doc": "^1.0.0"
+  }
+}
